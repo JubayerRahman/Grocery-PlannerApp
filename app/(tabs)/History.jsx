@@ -9,7 +9,7 @@ const History = () => {
 
   useEffect(()=>{
     LoadData()
-  })
+  },[])
 
       const date = new Date()
       const day = date.getDate()
@@ -24,9 +24,11 @@ const History = () => {
         const JsonData = JSON.parse(data)
 
         // checking the completed List
-        const CompleteArray = JsonData.filter(item => item.status === "completed")
+        // const CompleteArray = JsonData.filter(item => item.status == "completed")
         // setting the data into state
-        SetHistoryList(CompleteArray)
+        SetHistoryList(JsonData)
+
+        // console.log(CompleteArray);
       }
       else{
         console.log("No data found");
