@@ -24,7 +24,7 @@ const History = () => {
         const JsonData = JSON.parse(data)
 
         // checking the completed List
-        const CompleteArray = JsonData.filter(item => item.status === "complete")
+        const CompleteArray = JsonData.filter(item => item.status === "completed")
         // setting the data into state
         SetHistoryList(CompleteArray)
       }
