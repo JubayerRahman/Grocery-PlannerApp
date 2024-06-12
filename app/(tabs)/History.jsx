@@ -9,7 +9,7 @@ const History = () => {
 
   useEffect(()=>{
     LoadData()
-  },[])
+  })
 
       const date = new Date()
       const day = date.getDate()
@@ -56,6 +56,7 @@ const History = () => {
                 </View>
                 <View className="bg-white p-[10px] rounded-xl w-[80%] ml-[20px]">
                   <Text className="text-xl text-primaryBG">{list.date}</Text>
+                  <Text className={`${list.status === "completed"? "bg-yellow-200 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-primaryBG": "bg-orange-500 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-white"}`}>Status: {list.status}</Text>
                   {/* Divider */}
                    <View className="bg-yellow-400 h-[2px] rounded-xl mt-[10px] mb-[10px] "></View>
                   

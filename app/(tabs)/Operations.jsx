@@ -13,7 +13,7 @@ const Operations = () => {
   const [bottomBudget, setBottomBudget] = useState('');
   const sheetRef = useRef(null);
   const [isOpen, setIsOpen] = useState(true);
-  const [bottomListBuyIndex, setBottomListBuyIndex] = useState("");
+  const [bottomListBuyIndex, setBottomListBuyIndex] = useState([]);
   const [buyCount, setBuyCount] = useState(0);
   const [buyBarWidth, setBuyBarWidth] = useState(0);
   const [targetIndex, setTargetIndex] = useState();
@@ -78,9 +78,9 @@ const Operations = () => {
   };
 
   const buiedFunction = (index) => {
-    setBottomListBuyIndex(index);
-    setBuyCount(buyCount + 1);
-    const percentage = ((buyCount / listInBottom.length) * 100).toFixed(0);
+    setBottomListBuyIndex([...bottomListBuyIndex, index]);
+    // setBuyCount(buyCount + 1);
+    const percentage = ((bottomListBuyIndex.length / listInBottom.length) * 100).toFixed(0);
     setBuyBarWidth(percentage);
   };
 
@@ -119,6 +119,7 @@ const Operations = () => {
                   <View className="w-[70%]">
                     <Text className="text-xl">Budget: {list.budget}</Text>
                     <Text className="text-xl">Listed: {listDate === list.date ? "Today" : list.date}</Text>
+                    <Text className={`${list.status === "completed"? "bg-yellow-200 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-primaryBG": "bg-orange-500 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-white"}`}>Status: {list.status}</Text>
                   </View>
                   <TouchableOpacity onPress={() => openBottomSheet(index, list.list, list.budget)}><AntDesign name="playcircleo" size={40} color="black" /></TouchableOpacity>
                   <TouchableOpacity onPress={() => deleteFunction(index)}>
@@ -131,6 +132,9 @@ const Operations = () => {
                 <Link href="Form" className='text-xl text-white bg-orange-400 p-[10px] rounded-xl text-center mt-[20px]'>Make a List</Link>
               </View>
           }
+          <TouchableOpacity className="w-full" onPress={()=>{loadData()}}>
+            <Text className="text-xl text-white bg-green-400 p-[10px] rounded-xl w-full text-center mt-[20px]">Reload</Text>
+          </TouchableOpacity>
           <BottomSheet
             ref={sheetRef}
             index={-1}
@@ -144,14 +148,14 @@ const Operations = () => {
                 <Text className="text-xl mb-[10px]">Budget:{bottomBudget}</Text>
                 <View className="relative">
                   <View className="w-full h-[8px] rounded-xl bg-primaryBG"></View>
-                  <View style={{ width: `${buyBarWidth}%` }} className=" h-[8px] rounded-xl bg-yellow-200 absolute"></View>
+                  <View style={{ width: `${buyBarWidth}%` }} className=" h-[8px] max-w-full rounded-xl bg-yellow-200 absolute"></View>
                 </View>
                 {
                   listInBottom.map((list, index) =>
                     <View key={index} className={`${bottomListBuyIndex === index ? "bg-green-400 p-[10px] w-full flex-row justify-between rounded-xl" : "border-b-[2px] p-[10px] flex-row items-center justify-between w-full border-yellow-200"}`}>
                       <Text className="text-[18px]" key={index}>{index + 1}) {list}</Text>
                       <View className="flex-row items-center gap-4">
-                        <TouchableOpacity onPress={() => buiedFunction(index)}><AntDesign name="check" size={24} color="green" /></TouchableOpacity>
+                        <TouchableOpacity onPress={() => buiedFunction(list)}><AntDesign name="check" size={24} color="green" /></TouchableOpacity>
                       </View>
                     </View>)
                 }

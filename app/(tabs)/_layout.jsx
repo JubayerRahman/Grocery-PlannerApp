@@ -6,7 +6,7 @@ import { AntDesign } from '@expo/vector-icons';
 const TabIcons = ({name, icon, focused})=>{
   return(
     <View className="items-center w-full">
-      <View className={`${focused?"bg-yellow-400 p-[5px] w-[80%] rounded-xl items-center": "p-[5px] w-[80%] rounded-xl items-center"}`}>
+      <View className={`${focused?"bg-yellow-200 p-[5px] w-[80%] rounded-xl items-center": "p-[5px] w-[80%] rounded-xl items-center"}`}>
         <AntDesign name={icon} size={24} color={`${focused?"#28282B": "white"}`} />
       </View>
       <Text className={`${focused? "block text-white": "hidden"}`}>{name}</Text>
