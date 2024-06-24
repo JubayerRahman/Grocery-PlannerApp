@@ -4,21 +4,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Link } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler';
 
 const Operations = () => {
   const [groceryList, setGroceryList] = useState([]);
   const [listExpand, setListExpand] = useState(false);
   const [listInBottom, setListInBottom] = useState([]);
   const [bottomBudget, setBottomBudget] = useState('');
+  const [bottomStatus, setBottomStatus] = useState('')
   const sheetRef = useRef(null);
   const [isOpen, setIsOpen] = useState(true);
   const [bottomListBuyIndex, setBottomListBuyIndex] = useState([]);
   const [buyCount, setBuyCount] = useState(0);
   const [buyBarWidth, setBuyBarWidth] = useState(0);
   const [targetIndex, setTargetIndex] = useState();
+  const [spandInput, setSpandInput] = useState(0)
+  const [totalSpand, settotalSpand] = useState(0)
+  const [mainSpend, setMainSpend] = useState(0)
 
-  const SheetSnapPoint = ['40%', '60%'];
+  const SheetSnapPoint = ['40%', '60%', "80%"];
 
   useEffect(() => {
     loadData();
@@ -69,12 +73,14 @@ const Operations = () => {
   };
 
   // BottomSheetFunction
-  const openBottomSheet = (index, list, budget) => {
+  const openBottomSheet = (index, list, budget, status, spend) => {
     setIsOpen(true);
     sheetRef.current?.expand();
     setListInBottom(list);
     setBottomBudget(budget);
     setTargetIndex(index);
+    setBottomStatus(status)
+    setMainSpend(spend)
   };
 
   const buiedFunction = (index) => {
@@ -86,26 +92,42 @@ const Operations = () => {
 
   // Completing the shopping Function
   const completeFunction = async () => {
-    const data = await AsyncStorage.getItem("@groceryData");
 
-    if (data != null) {
-      const jsonData = JSON.parse(data);
-      const updateData = jsonData.filter((item, i) => i == targetIndex);
-      const otherData = jsonData.filter((item, i) => i !== targetIndex);
-      if (updateData.length > 0) {
-        updateData[0].status = "completed";
+    if (totalSpand === 0) {
+      Alert.alert("অনুগ্রহ করে আমাদের আপনার খরচ সম্পর্কে একটি আনুমানিক ধারণা দিন")
+    }
+
+    else{
+      const data = await AsyncStorage.getItem("@groceryData");
+
+      if (data != null) {
+        const jsonData = JSON.parse(data);
+        const updateData = jsonData.filter((item, i) => i == targetIndex);
+        const otherData = jsonData.filter((item, i) => i !== targetIndex);
+        if (updateData.length > 0) {
+          updateData[0].status = "completed"
+          updateData[0].spend = totalSpand;
+        }
+  
+        const allData = [updateData[0], ...otherData];
+  
+        // Saving the Data
+        await AsyncStorage.setItem('@groceryData', JSON.stringify(allData));
+        loadData();
+        Alert.alert("Shopping Completed !!!");
+        sheetRef.current?.close();
+        console.log(allData);
+        settotalSpand(0)
       }
-
-      const allData = [updateData[0], ...otherData];
-
-      // Saving the Data
-      await AsyncStorage.setItem('@groceryData', JSON.stringify(allData));
-      loadData();
-      Alert.alert("Shopping Completed !!!");
-      sheetRef.current?.close();
-      console.log(allData);
     }
   };
+
+  // Spand Function
+  const SpandFunction = async()=>{
+    settotalSpand(totalSpand + parseInt(spandInput))
+    await setBottomBudget(bottomBudget - spandInput)
+    setSpandInput(0)
+  }
 
   return (
     <GestureHandlerRootView className="flex-1 h-full">
@@ -121,7 +143,7 @@ const Operations = () => {
                     <Text className="text-xl">Listed: {listDate === list.date ? "Today" : list.date}</Text>
                     <Text className={`${list.status === "completed"? "bg-yellow-200 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-primaryBG": "bg-orange-500 w-[70%] p-[10px] rounded-xl mt-[10px] text-[16px] text-white"}`}>Status: {list.status}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => openBottomSheet(index, list.list, list.budget)}><AntDesign name="playcircleo" size={40} color="black" /></TouchableOpacity>
+                  <TouchableOpacity onPress={() => openBottomSheet(index, list.list, list.budget, list.status, list.spend)}><AntDesign name="playcircleo" size={40} color="black" /></TouchableOpacity>
                   <TouchableOpacity onPress={() => deleteFunction(index)}>
                     <AntDesign name="delete" size={40} color="black" />
                   </TouchableOpacity>
@@ -145,7 +167,18 @@ const Operations = () => {
             <BottomSheetScrollView>
               <View className="p-[10px] mb-[50px]">
                 <Text className="text-black text-2xl mb-[20px] text-center">Lets begin your Shppping:</Text>
+                <View className="flex-row justify-between p-[10px]">
                 <Text className="text-xl mb-[10px]">Budget:{bottomBudget}</Text>
+                <Text className={`${mainSpend === 0 ?"text-xl mb-[10px] block":"hidden"}`}>Total spent:{totalSpand}</Text>
+                <Text className={`${mainSpend === 0 ? "hidden" : "text-xl mb-[10px] block"}`}>Total spent:{mainSpend}</Text>
+                </View>
+                <View className={`${ console.log(listInBottom[0]), bottomStatus === "uncomplete" ? "flex-row items-center mt-[0px] mb-[10px] w-full": "hidden"}`}>
+                <Text className="mr-[20px] text-xl">Spend:</Text>
+                <TextInput value={spandInput} onChangeText={(num)=>setSpandInput(num)} onSubmitEditing={SpandFunction} className="border-2 border-yellow-200 p-[10px] rounded-xl mt-[20px] mb-[20px] w-[50%]" keyboardType='number-pad' placeholder='Spend Amount'/>
+                <TouchableOpacity onPress={SpandFunction} className="bg-primaryBG p-[10px] rounded-xl ml-[20px]">
+                <Text className=" text-xl text-white text-center">Add +</Text>
+                </TouchableOpacity>
+                </View>
                 <View className="relative">
                   <View className="w-full h-[8px] rounded-xl bg-primaryBG"></View>
                   <View style={{ width: `${buyBarWidth}%` }} className=" h-[8px] max-w-full rounded-xl bg-yellow-200 absolute"></View>

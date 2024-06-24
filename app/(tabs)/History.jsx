@@ -43,15 +43,15 @@ const History = () => {
     <ScrollView className="bg-primaryBG h-full">
       <View className="h-full justify-center p-[10px]  items-center">
         <Text className="text-white mt-[50px] text-3xl"></Text>
-        <View className="flex-row ">
+        <View className="flex-row items-start">
           <View className="bg-yellow-400 h-full w-[4px]"></View>
           <View className="ml-[-30px] w-[100%]">
           {
             HistoryList.length>0 ?
             
               HistoryList.map((list, index)=>
-              <View key={index} className=" mb-[5px] p-[10px] rounded-xl flex-row items-center">
-                <View className="bg-primaryBG p-[5px]">
+              <View key={index} className=" mb-[5px] p-[10px] rounded-xl flex-row items-start">
+                <View className="bg-primaryBG p-[5px] mt-[10px]">
                   <FontAwesome6 name="clock-rotate-left" size={30} color="white" />
                 </View>
                 <View className="bg-white p-[10px] rounded-xl w-[80%] ml-[20px]">

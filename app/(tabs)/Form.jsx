@@ -58,7 +58,8 @@ const Form = () => {
             list: groceryList,
             budget: budget,
             status: "uncomplete",
-            date: ListDate
+            date: ListDate,
+            spend:0
           }
 
           // adding the data into the AsyncStorage
